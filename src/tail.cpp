@@ -15,6 +15,7 @@
 
 #include <v8.h> // v8 is the Javascript engine used by Node
 #include <node.h>
+#include <string.h>
 
 using namespace std;
 using namespace v8;

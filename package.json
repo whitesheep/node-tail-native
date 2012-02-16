@@ -32,5 +32,6 @@
        } 
    ],
    "os": ["linux", "macos", "win"],
-   "cpu": ["x86", "ppc", "x86_64"] 
+   "cpu": ["x86", "ppc", "x86_64"],
+   "main" : "./tail" 
 }

@@ -2,7 +2,7 @@
  *  tail.cpp
  *  
  *
- *  Created by Marco Rondini on 14/02/12.
+ *  Node.js native module. Re-Implementation of 'tail -f' command.
  *  
  *
  */

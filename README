@@ -1,0 +1,8 @@
+Native module for node.js .
+
+Read new line in real time, as 'tail - f'.
+
+methods:
+
+	tail.start(<filename>, function(newline){}) // start real time read
+	tail.stop();	// stop real time read

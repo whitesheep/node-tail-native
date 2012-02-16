@@ -1,0 +1,26 @@
+{
+  "name" : "tail-native",
+
+  "version" : "v0.1.0"
+
+  , "scripts" : {
+      "preinstall" : "node-waf configure && node-waf build"
+      , "preuninstall" : "rm -rf build/*"
+    }
+
+  , "main" : "build/default/tail.node"
+
+  // The following fields are optional:
+
+  , "description" : "read new line in real time, as 'tail - f'"
+  , "homepage" : "https://github.com/whitesheep/node-tail-native"
+  , "author" : { 
+      "name" : "Marco Rondini"
+      , "email" : "white_sheep@ihteam.net"
+      , "url" : "http://www.marcorondini.eu/"
+    } 
+  , "repository" : { 
+      "type" : "git"
+      , "url" : "https://github.com/whitesheep/node-tail-native.git"
+    }
+}

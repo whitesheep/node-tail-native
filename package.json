@@ -18,7 +18,8 @@
    ],
    "contributors": [],
    "bugs": {
-       "mail": "white_sheep@ihteam.net"
+       "mail": "white_sheep@ihteam.net",
+       "url": "https://github.com/whitesheep/node-tail-native/issues"
    },
    "licenses": [
        {

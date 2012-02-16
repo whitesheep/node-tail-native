@@ -152,7 +152,7 @@ void Tail::EIO_Tail(eio_req *req) {
 			
 			
 		} else if ( position + length < last_position ) {				
-			int position = Tail::find_last_linefeed(infile);
+			position = Tail::find_last_linefeed(infile);
 			last_position = 0;
 			length = 0;
 		}
@@ -191,5 +191,5 @@ extern "C" {
 	static void init(Handle<Object> target) {
 		Tail::Init(target);
 	}
-	NODE_MODULE(tail, init);
+	NODE_MODULE(tailnative, init);
 }

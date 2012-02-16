@@ -15,14 +15,14 @@ def configure(conf):
 
 def build(bld):
   obj = bld.new_task_gen("cxx", "shlib", "node_addon")
-  obj.target = "tail"
+  obj.target = "tailnative"
   obj.source = "src/tail.cpp"
-  obj.cxxflags = ["-D_FILE_OFFSET_BITS=64", "-D_LARGEFILE_SOURCE" ]
+  obj.cxxflags = ["-g", "-Wall", "-D_FILE_OFFSET_BITS=64", "-D_LARGEFILE_SOURCE" ]
 
 def shutdown():
   if Options.commands['clean']:
-    if exists('tail.node'): 
-	unlink('tail.node')
+    if exists('tailnative.node'): 
+	unlink('tailnative.node')
   else:
-    if exists('build/Release/tail.node') and not exists('tail.node'):
-      symlink('build/Release/tail.node', 'tail.node')
+    if exists('build/Release/tailnative.node') and not exists('tailnative.node'):
+      symlink('build/Release/tailnative.node', 'tailnative.node')

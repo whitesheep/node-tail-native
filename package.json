@@ -1,6 +1,7 @@
 {
    "name": "tail-native",
    "version": "0.1.0",
+   "main" : "tailnative",
    "description": "Native (C++) Re-Implemetation of 'tail -f' command",
    "keywords": [
        "package",
@@ -32,6 +33,5 @@
        } 
    ],
    "os": ["linux", "macos", "win"],
-   "cpu": ["x86", "ppc", "x86_64"],
-   "main" : "./tail" 
+   "cpu": ["x86", "ppc", "x86_64"]
 }

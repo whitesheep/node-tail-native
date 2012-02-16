@@ -1,4 +1,4 @@
-var Tail = require("../tail-native").Tail;
+var Tail = require("../tailnative").Tail;
 var tail = new Tail();
 
 tail.start("testfile", function(err, data) {

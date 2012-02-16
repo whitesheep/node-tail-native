@@ -1,5 +1,5 @@
 {
-   "name": "tail-native",
+   "name": "tailnative",
    "version": "0.1.0",
    "main" : "tailnative",
    "description": "Native (C++) Re-Implemetation of 'tail -f' command",

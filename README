@@ -4,5 +4,5 @@ Read new line in real time, as 'tail - f'.
 
 methods:
 
-	tail.start(<filename>, function(error, newline){}) // start real time read
-	tail.stop();	// stop real time read
+	var instance = tail.start(<filename>, function(error, newline){}) // start real time read
+	tail.stop(instance);	// stop real time read

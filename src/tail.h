@@ -10,6 +10,11 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <map>
+
+#include <cstdlib>   // for rand()
+#include <cctype>    // for isalnum()   
+#include <algorithm> // for back_inserter
 
 #include <v8.h> // v8 is the Javascript engine used by Node
 #include <node.h>
@@ -19,15 +24,14 @@ using namespace v8;
 
 class Tail : node::ObjectWrap {
 private:
-	bool b_stop;
+	map<std::string, bool> m_instance;
 public:
-	Tail() {
-		b_stop = true;
-	}
+	Tail() {}
 	~Tail() {}
 	
 	struct tail_baton_t {
 		Persistent<Function> cb;
+		std::string instance;
 		std::string filename;
 		Tail *T;
 	};
@@ -37,6 +41,10 @@ public:
 		std::string line;
 		std::string err;
 	};
+	
+	static char rand_alnum();
+	
+	static std::string rand_alnum_str(std::string::size_type sz);
 	
 	static int find_last_linefeed(ifstream &infile);
 	

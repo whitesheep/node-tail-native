@@ -12,10 +12,17 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <map>
+
+#include <cstdlib>   // for rand()
+#include <cctype>    // for isalnum()   
+#include <algorithm> // for back_inserter
 
 #include <v8.h> // v8 is the Javascript engine used by Node
 #include <node.h>
 #include <string.h>
+
+#define INSTANCE_LENGTH 10
 
 using namespace std;
 using namespace v8;
@@ -37,6 +44,20 @@ int Tail::find_last_linefeed(ifstream &infile) {
 	}
 	
 	return 0;
+}
+
+char Tail::rand_alnum() {
+    char c;
+    while (!std::isalnum(c = static_cast<char>(std::rand())))
+        ;
+    return c;
+}
+
+std::string Tail::rand_alnum_str (std::string::size_type sz){
+    std::string s;
+    s.reserve  (sz);
+    generate_n (std::back_inserter(s), sz, rand_alnum);
+    return s;
 }
 
 void Tail::Init(Handle<Object> target) {
@@ -65,11 +86,21 @@ Handle<Value> Tail::stop(const Arguments& args) {
 	HandleScope scope;
 	Tail* tail_instance = node::ObjectWrap::Unwrap<Tail>(args.This());
 	
+	if (!args[0]->IsString())                   
+		return ThrowException(Exception::TypeError(String::New("Argument 1 must be a String")));
+	
+	String::Utf8Value v8instance(args[0]->ToString());
+	std::string tmp_inst = strtok(*v8instance, "");
+	
 	Handle<Boolean> ret = v8::Boolean::New(false);
 	
-	if ( tail_instance->b_stop == false ){
-		tail_instance->b_stop = true;
-		ret = v8::Boolean::New(true); 
+	if ( tail_instance->m_instance.count(tmp_inst) != 0 ){
+		
+		if ( tail_instance->m_instance[tmp_inst] == false ){
+			tail_instance->m_instance[tmp_inst] = true;
+			ret = v8::Boolean::New(true); 
+		}
+		
 	}
 	
 	return scope.Close(ret);
@@ -88,21 +119,27 @@ Handle<Value> Tail::start(const Arguments& args) {
 	
 	
 	String::Utf8Value v8filename(args[0]->ToString());
-	
-	
-	tail_baton_t *tail_bat = new tail_baton_t();
-	
 	Local<Function> cb = Local<Function>::Cast(args[1]);
 	
+	std::string tmp_inst = Tail::rand_alnum_str(INSTANCE_LENGTH);
+	while ( tail_instance->m_instance.count(tmp_inst) != 0 )
+		tmp_inst = Tail::rand_alnum_str(INSTANCE_LENGTH);
+	
+	tail_instance->m_instance[tmp_inst] = false;
+	
+	tail_baton_t *tail_bat = new tail_baton_t();
 	tail_bat->cb = Persistent<Function>::New(cb);
 	tail_bat->filename = strtok(*v8filename, "");
 	tail_bat->T = tail_instance;
+	tail_bat->instance = tmp_inst;
 	
 	tail_instance->Ref();
 	eio_custom(EIO_Tail, EIO_PRI_DEFAULT, EIO_AfterTail, tail_bat);
 	ev_ref(EV_DEFAULT_UC);
 	
-	return Undefined();
+	
+	Local<String> ret = v8::String::New(tmp_inst.c_str());
+	return scope.Close(ret);
 }
 void Tail::EIO_Tail(eio_req *req) {
 	tail_baton_t *tail_bat = static_cast<tail_baton_t *>(req->data);
@@ -111,9 +148,8 @@ void Tail::EIO_Tail(eio_req *req) {
 	int position = Tail::find_last_linefeed(infile);
 	int last_position = position;
 	int length = 0;
-	tail_bat->T->b_stop = false;
 	
-	while (!tail_bat->T->b_stop) {
+	while (!tail_bat->T->m_instance[tail_bat->instance]) {
 		ifstream infile(tail_bat->filename.c_str());
 		position = Tail::find_last_linefeed(infile);
 		if (position > last_position) {
@@ -125,7 +161,7 @@ void Tail::EIO_Tail(eio_req *req) {
 				if ( tmp_pos < 0 ){
 					line_bat->err = "File pointer corrupted.";
 					eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-					tail_bat->T->b_stop = true;
+					tail_bat->T->m_instance[tail_bat->instance] = true;
 					break;
 				}
 				
@@ -136,7 +172,7 @@ void Tail::EIO_Tail(eio_req *req) {
 				if ( tmp_tellg == -1 ) {
 					line_bat->err = "File pointer corrupted.";
 					eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-					tail_bat->T->b_stop = true;
+					tail_bat->T->m_instance[tail_bat->instance] = true;
 					break;
 				}
 				
@@ -160,7 +196,7 @@ void Tail::EIO_Tail(eio_req *req) {
 		usleep(250000);
 	}
 	
-	
+	tail_bat->T->m_instance.erase(tail_bat->instance);
 	return;
 }
 

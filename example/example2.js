@@ -1,7 +1,7 @@
 var Tail = require("../tailnative").Tail;
 var tail = new Tail();
 
-tail.start("testfile", function(err, data) {
+var inst = tail.start("testfile", function(err, data) {
     if (err){
         console.log(err);
         return;
@@ -10,9 +10,9 @@ tail.start("testfile", function(err, data) {
 });
 
 t=setInterval(function(){
-    if ( tail.stop() )
+    if ( tail.stop(inst) )
         console.log("stopped");
     else
         console.log("alredy stopped");
     //clearInterval(t);
-}, 1000);
+}, 5000);

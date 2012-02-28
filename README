@@ -2,6 +2,7 @@ Native module for node.js .
 
 Read new line in real time, as 'tail - f'.
 
+
 methods:
 
 	var instance = tail.start(<filename>, function(error, newline){}) // start real time read

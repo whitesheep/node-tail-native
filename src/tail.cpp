@@ -46,6 +46,26 @@ int Tail::find_last_linefeed(ifstream &infile) {
 	return 0;
 }
 
+int Tail::find_line_lenght(ifstream &infile, int position) {
+	
+	infile.seekg(0, ios::end);
+	int filesize = infile.tellg();
+	
+	infile.seekg(position, ios::beg);
+	
+	cout << "filesize : " << filesize << endl;
+	
+	for ( int n = 1; n <= filesize - position; n++ ) {
+		infile.seekg(position + n, ios::beg);
+		char c;
+		infile.get(c);
+		
+		if ( c == '\n' ) 
+			return n;
+	}
+	return 0;
+}
+
 char Tail::rand_alnum() {
     char c;
     while (!std::isalnum(c = static_cast<char>(std::rand())))
@@ -153,6 +173,9 @@ void Tail::EIO_Tail(eio_req *req) {
 		ifstream infile(tail_bat->filename.c_str());
 		position = Tail::find_last_linefeed(infile);
 		if (position > last_position) {
+			
+			int length = Tail::find_line_lenght(infile, last_position);	
+			
 			for ( int tmp_pos = last_position; tmp_pos <= position - length; tmp_pos += length ){
 				
 				line_baton_t *line_bat = new line_baton_t();

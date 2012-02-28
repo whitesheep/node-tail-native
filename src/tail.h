@@ -47,6 +47,8 @@ public:
 	static std::string rand_alnum_str(std::string::size_type sz);
 	
 	static int find_last_linefeed(ifstream &infile);
+
+	static int find_line_lenght(ifstream &infile, int position);
 	
 	static v8::Persistent<FunctionTemplate> persistent_function_template;
 	

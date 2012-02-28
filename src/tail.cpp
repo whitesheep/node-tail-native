@@ -52,9 +52,7 @@ int Tail::find_line_lenght(ifstream &infile, int position) {
 	int filesize = infile.tellg();
 	
 	infile.seekg(position, ios::beg);
-	
-	cout << "filesize : " << filesize << endl;
-	
+		
 	for ( int n = 1; n <= filesize - position; n++ ) {
 		infile.seekg(position + n, ios::beg);
 		char c;

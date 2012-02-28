@@ -1,6 +1,6 @@
 {
    "name": "tailnative",
-   "version": "0.1.1",
+   "version": "0.1.2",
    "main" : "tailnative",
    "description": "Native (C++) Re-Implemetation of 'tail -f' command",
    "keywords": [

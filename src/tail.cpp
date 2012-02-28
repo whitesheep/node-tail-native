@@ -27,7 +27,6 @@
 using namespace std;
 using namespace v8;
 
-
 int Tail::find_last_linefeed(ifstream &infile) {
 	
 	infile.seekg(0, ios::end);

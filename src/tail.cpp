@@ -1,6 +1,6 @@
 /*
  *  tail.cpp
- *  
+ *
  *
  *  Node.js native module. Re-Implementation of 'tail -f' command.
  *  
@@ -12,11 +12,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <map>
-
-#include <cstdlib>   // for rand()
-#include <cctype>    // for isalnum()   
-#include <algorithm> // for back_inserter
 
 #include <v8.h> // v8 is the Javascript engine used by Node
 #include <node.h>
@@ -26,6 +21,18 @@
 
 using namespace std;
 using namespace v8;
+
+void Tail::Emit(Handle<String> event, int argc, Handle<Value> argv[]){
+    HandleScope scope;
+    Handle<Value> argv_[argc + 1];
+    
+	argv_[0] = event;
+    
+	for ( int i=0; i < argc; i++ ) 
+		argv_[i + 1] = argv[i];
+	
+    node::MakeCallback(handle_, "emit", argc + 1, argv_);
+}  
 
 int Tail::find_last_linefeed(ifstream &infile) {
 	
@@ -63,22 +70,13 @@ int Tail::find_line_lenght(ifstream &infile, int position) {
 	return 0;
 }
 
-char Tail::rand_alnum() {
-    char c;
-    while (!std::isalnum(c = static_cast<char>(std::rand())))
-        ;
-    return c;
-}
-
-std::string Tail::rand_alnum_str (std::string::size_type sz){
-    std::string s;
-    s.reserve  (sz);
-    generate_n (std::back_inserter(s), sz, rand_alnum);
-    return s;
-}
-
 void Tail::Init(Handle<Object> target) {
 	v8::HandleScope scope;
+	
+	data_symbol = NODE_PSYMBOL("data");
+	error_symbol = NODE_PSYMBOL("error");
+	end_symbol = NODE_PSYMBOL("end");
+	
 	v8::Local<FunctionTemplate> local_function_template = v8::FunctionTemplate::New(New);
 	
 	Tail::persistent_function_template = v8::Persistent<FunctionTemplate>::New(local_function_template);
@@ -94,8 +92,12 @@ void Tail::Init(Handle<Object> target) {
 
 Handle<Value> Tail::New(const Arguments& args) {
 	HandleScope scope;
+	
 	Tail* tail_instance = new Tail();
-	tail_instance->Wrap(args.This());		
+	tail_instance->Wrap(args.This());
+
+	tail_instance->wstop = true;
+	
 	return args.This();
 }
 
@@ -103,24 +105,12 @@ Handle<Value> Tail::stop(const Arguments& args) {
 	HandleScope scope;
 	Tail* tail_instance = node::ObjectWrap::Unwrap<Tail>(args.This());
 	
-	if (!args[0]->IsString())                   
-		return ThrowException(Exception::TypeError(String::New("Argument 1 must be a String")));
+	if ( tail_instance->wstop )
+		return ThrowException(Exception::TypeError(String::New("Instance not started.")));
 	
-	String::Utf8Value v8instance(args[0]->ToString());
-	std::string tmp_inst = strtok(*v8instance, "");
+	tail_instance->wstop = true;
 	
-	Handle<Boolean> ret = v8::Boolean::New(false);
-	
-	if ( tail_instance->m_instance.count(tmp_inst) != 0 ){
-		
-		if ( tail_instance->m_instance[tmp_inst] == false ){
-			tail_instance->m_instance[tmp_inst] = true;
-			ret = v8::Boolean::New(true); 
-		}
-		
-	}
-	
-	return scope.Close(ret);
+	return scope.Close(Undefined());
 }
 
 Handle<Value> Tail::start(const Arguments& args) {
@@ -128,35 +118,26 @@ Handle<Value> Tail::start(const Arguments& args) {
 	
 	Tail* tail_instance = node::ObjectWrap::Unwrap<Tail>(args.This());
 	
+	if ( !tail_instance->wstop )
+		return ThrowException(Exception::TypeError(String::New("Instance alredy started.")));
+	
 	if (!args[0]->IsString())                   
 		return ThrowException(Exception::TypeError(String::New("Argument 1 must be a String")));
 	
-	if (!args[1]->IsFunction())                   
-		return ThrowException(Exception::TypeError(String::New("Argument 2 must be a Function")));
-	
-	
 	String::Utf8Value v8filename(args[0]->ToString());
-	Local<Function> cb = Local<Function>::Cast(args[1]);
 	
-	std::string tmp_inst = Tail::rand_alnum_str(INSTANCE_LENGTH);
-	while ( tail_instance->m_instance.count(tmp_inst) != 0 )
-		tmp_inst = Tail::rand_alnum_str(INSTANCE_LENGTH);
-	
-	tail_instance->m_instance[tmp_inst] = false;
+	tail_instance->wstop = false;
 	
 	tail_baton_t *tail_bat = new tail_baton_t();
-	tail_bat->cb = Persistent<Function>::New(cb);
 	tail_bat->filename = strtok(*v8filename, "");
 	tail_bat->T = tail_instance;
-	tail_bat->instance = tmp_inst;
 	
 	tail_instance->Ref();
 	eio_custom(EIO_Tail, EIO_PRI_DEFAULT, EIO_AfterTail, tail_bat);
 	ev_ref(EV_DEFAULT_UC);
 	
+	return scope.Close(Undefined());
 	
-	Local<String> ret = v8::String::New(tmp_inst.c_str());
-	return scope.Close(ret);
 }
 void Tail::EIO_Tail(eio_req *req) {
 	tail_baton_t *tail_bat = static_cast<tail_baton_t *>(req->data);
@@ -166,7 +147,7 @@ void Tail::EIO_Tail(eio_req *req) {
 	int last_position = position;
 	int length = 0;
 	
-	while (!tail_bat->T->m_instance[tail_bat->instance]) {
+	while (!tail_bat->T->wstop) {
 		ifstream infile(tail_bat->filename.c_str());
 		position = Tail::find_last_linefeed(infile);
 		if (position > last_position) {
@@ -176,12 +157,14 @@ void Tail::EIO_Tail(eio_req *req) {
 			for ( int tmp_pos = last_position; tmp_pos <= position - length; tmp_pos += length ){
 				
 				line_baton_t *line_bat = new line_baton_t();
-				line_bat->cb = tail_bat->cb;
+
+				line_bat->T = tail_bat->T;
+				line_bat->err = false;
 				
 				if ( tmp_pos < 0 ){
-					line_bat->err = "File pointer corrupted.";
+					line_bat->err = true;
 					eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-					tail_bat->T->m_instance[tail_bat->instance] = true;
+					tail_bat->T->wstop = true;
 					break;
 				}
 				
@@ -190,9 +173,9 @@ void Tail::EIO_Tail(eio_req *req) {
 				int tmp_tellg = infile.tellg();
 				
 				if ( tmp_tellg == -1 ) {
-					line_bat->err = "File pointer corrupted.";
+					line_bat->err = true;
 					eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-					tail_bat->T->m_instance[tail_bat->instance] = true;
+					tail_bat->T->wstop = true;
 					break;
 				}
 				
@@ -216,12 +199,14 @@ void Tail::EIO_Tail(eio_req *req) {
 		usleep(250000);
 	}
 	
-	tail_bat->T->m_instance.erase(tail_bat->instance);
 	return;
 }
 
 int Tail::EIO_AfterTail(eio_req *req){
 	tail_baton_t *tail_bat = static_cast<tail_baton_t *>(req->data);
+	
+	tail_bat->T->Emit(end_symbol, 0, NULL);
+	
 	ev_unref(EV_DEFAULT_UC);
 	tail_bat->T->Unref();
 	return 0;
@@ -230,12 +215,13 @@ int Tail::EIO_AfterTail(eio_req *req){
 int Tail::EIO_AfterLine(eio_req *req){
 	line_baton_t *line_bat = static_cast<line_baton_t *>(req->data);
 	
-	Local<Value> argv[2];
-	
-	argv[0] = String::New(line_bat->err.c_str());
-	argv[1] = String::New(line_bat->line.c_str());
-	
-	line_bat->cb->Call(Context::GetCurrent()->Global(), 2, argv);
+	if ( line_bat->err ){
+		line_bat->T->Emit(error_symbol, 0, NULL);
+	} else {
+		Local<Value> argv[1];
+		argv[0] = String::New(line_bat->line.c_str());
+		line_bat->T->Emit(data_symbol, 1, argv);  
+	}
 	
 	return 0;
 }

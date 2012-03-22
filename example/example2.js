@@ -1,18 +1,20 @@
-var Tail = require("../tailnative").Tail;
-var tail = new Tail();
+var tail = require("../tailnative");
 
-var inst = tail.start("testfile", function(err, data) {
-    if (err){
-        console.log(err);
-        return;
-    }
-    console.log("from js " + data);
+tail.start(__dirname + "/testfile", function(t){
+    
+    t.on('data', function(data){
+        console.log(t.file + ': ' + data);
+    });
+    
+    t.on('error', function(){
+        console.log('error');
+    });
+    
+    t.on('end', function(){
+        console.log('end');
+    });
+    
+    setTimeout(function(){
+        t.stop();
+    }, 2000);
 });
-
-t=setInterval(function(){
-    if ( tail.stop(inst) )
-        console.log("stopped");
-    else
-        console.log("alredy stopped");
-    //clearInterval(t);
-}, 5000);

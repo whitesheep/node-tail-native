@@ -3,14 +3,14 @@ Native module for node.js .
 Read new line in real time, as 'tail - f'.
 
 Install:
-________
+========
 
 	npm install tailnative
 
 
 
 Example: 
-________
+========
 
 	var tail = require('tailnative');
 	

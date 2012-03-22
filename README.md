@@ -2,6 +2,8 @@ Native module for node.js .
 
 Read new line in real time, as 'tail - f'.
 
+Install:
+	npm install tailnative
 
 Example: 
 

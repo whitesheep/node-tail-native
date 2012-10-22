@@ -1,8 +1,11 @@
 {
    "name": "tailnative",
-   "version": "0.2.0",
+   "version": "0.2.1",
    "main" : "tailnative",
    "description": "Native (C++) Re-Implemetation of 'tail -f' command",
+   "scripts": { 
+       "install": "CXX=g++ node-gyp configure build" 
+   },
    "keywords": [
        "package",
        "tail",
@@ -34,5 +37,5 @@
        } 
    ],
    "os": ["linux", "macos", "win"],
-   "cpu": ["x86", "ppc", "x86_64"]
+   "cpu": ["x86", "ppc", "x86_64", "ia32"]
 }

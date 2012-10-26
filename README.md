@@ -25,9 +25,9 @@ Tailnative, from 0.3 version, support `line separator`
 
 _Event emits:_
 
-	data 	`function(data){}`
-	end		`function(){}`
-	error	`function(error){}`
+data 	`function(data){}`
+end		`function(){}`
+error	`function(error){}`
 
 
 

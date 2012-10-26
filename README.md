@@ -7,28 +7,47 @@ Install:
 
 	npm install tailnative
 
+or
+
+	git clone git://github.com/whitesheep/node-tail-native.git
+	cd node-tail-native
+	node-gyp configure build
 
 
-Example: 
+Use: 
 ========
 
-	var tail = require('tailnative');
+Tailnative, from 0.3 version, support `line separator`
 	
-	tail.start(__dirname + '/testfile', function(t){
-	    
-	    t.on('data', function(data){
-	        console.log(t.file + ': ' + data);
-	    });
-	    
-	    t.on('error', function(){
-	        console.log('error');
-	    });
-	    
-	    t.on('end', function(){
-	        console.log('end');
-	    });
-	    
-	    setTimeout(function(){
-	        t.stop();
-	    }, 6000);
+	new Tail(filename, "\r\n");
+
+
+
+_Event emits:_
+
+	data 	`function(data){}`
+	end		`function(){}`
+	error	`function(error){}`
+
+
+
+_Example code :_
+
+	var Tail = require("tailnative");
+	
+	var lineseparator = "\n";
+	var tail = new Tail(__dirname + "/testfile", lineseparator);
+	
+    
+	tail.on('data', function(data){
+	    console.log(this.file + ': ' + data);
+	});
+
+	tail.on('error', function(){
+	    console.log('error');
+		tail.close();
+	});
+
+	tail.on('end', function(){
+	    console.log('end');
 	});

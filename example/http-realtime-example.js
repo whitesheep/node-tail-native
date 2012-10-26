@@ -1,16 +1,18 @@
-var tail = require("../tailnative");
+var Tail = require("../tailnative");
 var http = require("http");
 
 var filename = process.argv[2];
 
-if (!filename)
-    return sys.puts("Usage: node http-realtime-example.js filename");
+if ( typeof filename === 'undefined' ) {
+    console.error("Usage: node http-realtime-example.js filename");
+    process.exit();
+}
 
-var t = tail.start(filename);
+var tail = new Tail(__dirname + "/testfile");
 
 http.createServer(function(req,res){
     res.writeHead(200,{"Content-Type": "text/plain"});
-    t.on('data', function (data) {
+    tail.on('data', function (data) {
         console.log(data);
         res.write(data + "\r\n");
     });  

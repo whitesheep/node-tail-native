@@ -1,20 +1,27 @@
-var tail = require("../tailnative");
+var Tail = require("../tailnative");
+var util = require('util');
+var Stream = require('stream').Stream;
 
-tail.start(__dirname + "/testfile", function(t){
-    
-    t.on('data', function(data){
-        console.log(t.file + ': ' + data);
-    });
-    
-    t.on('error', function(){
-        console.log('error');
-    });
-    
-    t.on('end', function(){
-        console.log('end');
-    });
-    
-    setTimeout(function(){
-        t.stop();
-    }, 2000);
-});
+var test_stream = function(){
+	this.writable = true;
+  	this.readable = true;
+}
+
+util.inherits(test_stream, Stream);
+
+test_stream.prototype.write = function (buffer) {
+    console.log("Streamed " + buffer);
+}
+
+test_stream.prototype.end = function() {
+  	this.emit('end');
+}
+
+test_stream.prototype.error = function() {
+	this.emit('error');
+}
+
+var ts = new test_stream();
+var tail = new Tail(__dirname + "/testfile");
+
+tail.pipe(ts);

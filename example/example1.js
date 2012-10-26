@@ -1,19 +1,19 @@
-var tail = require("../tailnative");
+var Tail = require("../tailnative");
+var tail = new Tail(__dirname + "/testfile");
 
-var t = tail.start(__dirname + "/testfile");
     
-t.on('data', function(data){
+tail.on('data', function(data){
     console.log(this.file + ': ' + data);
 });
 
-t.on('error', function(){
+tail.on('error', function(){
     console.log('error');
 });
 
-t.on('end', function(){
+tail.on('end', function(){
     console.log('end');
 });
 
 setTimeout(function(){
-    t.stop();
+    t.close();
 }, 2000);

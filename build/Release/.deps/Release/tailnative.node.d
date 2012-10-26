@@ -1,1 +1,0 @@
-cmd_Release/tailnative.node := ./gyp-mac-tool flock ./Release/linker.lock g++ -shared -Wl,-search_paths_first -mmacosx-version-min=10.5 -arch x86_64 -L./Release -install_name /usr/local/lib/tailnative.node  -o Release/tailnative.node Release/obj.target/tailnative/src/tail.o -L/opt/local/lib -lssl -lcrypto -undefined dynamic_lookup

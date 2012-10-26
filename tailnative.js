@@ -1,24 +1,7 @@
 var Stream = require('stream').Stream;
 var Tailnative = require(__dirname + '/build/Release/tailnative.node').Tail;
+var util = require('util');
 
-Tailnative.prototype.__proto__ = Stream.prototype;
+util.inherits(Tailnative, Stream);
 
-var Tail = function(){
-    this.readable = true;
-    this.writable = false;
-}
-Tail.prototype.__proto__ = Stream.prototype;
-
-Tail.prototype.start = function(file, cb){
-    var tn = new Tailnative();
-    tn.file = file;
-    tn.start(file);
-    
-    if ( typeof cb === 'function' )
-        cb.call(this, tn);
-   
-    return tn;
-}
-
-
-module.exports = new Tail();
+module.exports = Tailnative;

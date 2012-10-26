@@ -15,7 +15,6 @@
 
 #include <v8.h> // v8 is the Javascript engine used by Node
 #include <node.h>
-#include <string.h>
 
 #define INSTANCE_LENGTH 10
 
@@ -24,51 +23,17 @@ using namespace v8;
 
 void Tail::Emit(Handle<String> event, int argc, Handle<Value> argv[]){
     HandleScope scope;
-    Handle<Value> argv_[argc + 1];
+    
+    Handle<Value>* argv_ = new Handle<Value>[argc + 1];
     
 	argv_[0] = event;
     
-	for ( int i=0; i < argc; i++ ) 
-		argv_[i + 1] = argv[i];
+	for ( int i = 1; i <= argc; i++ )
+		argv_[i] = argv[i - 1];
 	
     node::MakeCallback(handle_, "emit", argc + 1, argv_);
 }  
 
-int Tail::find_last_linefeed(ifstream &infile) {
-	
-	infile.seekg(0, ios::end);
-	int filesize = infile.tellg();
-	
-	for ( int n = 1; n < filesize; n++ ) {
-		infile.seekg(filesize - n, ios::beg);
-		
-		char c;
-		infile.get(c);
-		
-		if ( c == '\n' ) 
-			return infile.tellg();
-	}
-	
-	return 0;
-}
-
-int Tail::find_line_lenght(ifstream &infile, int position) {
-	
-	infile.seekg(0, ios::end);
-	int filesize = infile.tellg();
-	
-	infile.seekg(position, ios::beg);
-		
-	for ( int n = 1; n <= filesize - position; n++ ) {
-		infile.seekg(position + n, ios::beg);
-		char c;
-		infile.get(c);
-		
-		if ( c == '\n' ) 
-			return n;
-	}
-	return 0;
-}
 
 void Tail::Init(Handle<Object> target) {
 	v8::HandleScope scope;
@@ -76,162 +41,135 @@ void Tail::Init(Handle<Object> target) {
 	data_symbol = NODE_PSYMBOL("data");
 	error_symbol = NODE_PSYMBOL("error");
 	end_symbol = NODE_PSYMBOL("end");
-	
-	v8::Local<FunctionTemplate> local_function_template = v8::FunctionTemplate::New(New);
-	
-	Tail::persistent_function_template = v8::Persistent<FunctionTemplate>::New(local_function_template);
-	Tail::persistent_function_template->InstanceTemplate()->SetInternalFieldCount(1); 
-	Tail::persistent_function_template->SetClassName(v8::String::NewSymbol("Tail"));
-	
-	
-	NODE_SET_PROTOTYPE_METHOD(persistent_function_template, "start", start);
-	NODE_SET_PROTOTYPE_METHOD(persistent_function_template, "stop", stop);
-	
-	target->Set(String::NewSymbol("Tail"), Tail::persistent_function_template->GetFunction());
+    
+    // Prepare constructor template
+    Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
+    tpl->SetClassName(String::NewSymbol("Tail"));
+    tpl->InstanceTemplate()->SetInternalFieldCount(3);
+    
+    // Prototype
+    tpl->InstanceTemplate()->Set(String::NewSymbol("close"), FunctionTemplate::New(close)->GetFunction());
+    tpl->InstanceTemplate()->SetAccessor(String::NewSymbol("readable"), Tail::GetReadable);
+    tpl->InstanceTemplate()->SetAccessor(String::NewSymbol("writable"), Tail::GetWritable);
+    
+    Persistent<Function> constructor = Persistent<Function>::New(tpl->GetFunction());
+    target->Set(String::NewSymbol("Tail"), constructor);
 }
 
 Handle<Value> Tail::New(const Arguments& args) {
 	HandleScope scope;
 	
-	Tail* tail_instance = new Tail();
+    assert(args.IsConstructCall());
+    
+    Tail* tail_instance = new Tail();
 	tail_instance->Wrap(args.This());
-
-	tail_instance->wstop = true;
+    
+    
+	if (!args[0]->IsString())
+		return ThrowException(Exception::TypeError(String::New("Argument 1 must be a String")));
 	
+    if (!args[1]->IsString())
+		tail_instance->separator = "\n";
+    else {
+        String::Utf8Value v8separator(args[1]->ToString());
+        tail_instance->separator = std::string(*v8separator, v8separator.length());
+    }
+    
+	String::Utf8Value filename(args[0]);
+    
+    ifstream fp(*filename, ios::binary);
+    fp.seekg(0, ios::end);
+    tail_instance->last_position = fp.tellg();
+    fp.close();
+    
+    tail_instance->_event_handle.data = reinterpret_cast<void*>(tail_instance);
+    tail_instance->Ref();
+
+    int r = uv_fs_event_init(uv_default_loop(), &tail_instance->_event_handle, *filename, OnEvent, 0);
+    
+    if (r == 0){
+        tail_instance->ontail = false;
+    } else
+        node::SetErrno(uv_last_error(uv_default_loop()));
+    
 	return args.This();
 }
 
-Handle<Value> Tail::stop(const Arguments& args) {
+Handle<Value> Tail::GetReadable(Local<String> property, const AccessorInfo& info) {
+    HandleScope scope;
+    return scope.Close(v8::True());
+}
+
+Handle<Value> Tail::GetWritable(Local<String> property, const AccessorInfo& info) {
+    HandleScope scope;
+    return scope.Close(v8::False());
+}
+
+Handle<Value> Tail::close(const Arguments& args) {
 	HandleScope scope;
-	Tail* tail_instance = node::ObjectWrap::Unwrap<Tail>(args.This());
 	
-	if ( tail_instance->wstop )
-		return ThrowException(Exception::TypeError(String::New("Instance not started.")));
-	
-	tail_instance->wstop = true;
-	
+    assert(!args.Holder().IsEmpty());
+    assert(args.Holder()->InternalFieldCount() > 0);
+    
+    void* ptr = args.Holder()->GetPointerFromInternalField(0);
+    Tail* tail_instance = static_cast<Tail*>(ptr);
+    
+    uv_unref(reinterpret_cast<uv_handle_t*>(&tail_instance->_event_handle));
+    
+    tail_instance->Emit(end_symbol, 0, NULL);
+    
 	return scope.Close(Undefined());
 }
 
-Handle<Value> Tail::start(const Arguments& args) {
+void Tail::OnEvent(uv_fs_event_t* handle, const char* filename, int events, int status) {
 	HandleScope scope;
-	
-	Tail* tail_instance = node::ObjectWrap::Unwrap<Tail>(args.This());
-	
-	if ( !tail_instance->wstop )
-		return ThrowException(Exception::TypeError(String::New("Instance alredy started.")));
-	
-	if (!args[0]->IsString())                   
-		return ThrowException(Exception::TypeError(String::New("Argument 1 must be a String")));
-	
-	String::Utf8Value v8filename(args[0]->ToString());
-	
-	tail_instance->wstop = false;
-	
-	tail_baton_t *tail_bat = new tail_baton_t();
-	tail_bat->filename = strtok(*v8filename, "");
-	tail_bat->T = tail_instance;
-	
-	tail_instance->Ref();
-	eio_custom(EIO_Tail, EIO_PRI_DEFAULT, EIO_AfterTail, tail_bat);
-	ev_ref(EV_DEFAULT_UC);
-	
-	return scope.Close(Undefined());
-	
-}
-void Tail::EIO_Tail(eio_req *req) {
-	tail_baton_t *tail_bat = static_cast<tail_baton_t *>(req->data);
-	
-	ifstream infile(tail_bat->filename.c_str());
-	int position = Tail::find_last_linefeed(infile);
-	int last_position = position;
+    
+    Tail* tail_instance = reinterpret_cast<Tail*>(handle->data);
+    assert(tail_instance->handle_.IsEmpty() == false);
+    
+    if ( tail_instance->ontail ) return;
+    if (events & UV_RENAME) return;
+    
+    tail_instance->ontail = true;
+    
 	int length = 0;
-	
-	while (!tail_bat->T->wstop) {
-		ifstream infile(tail_bat->filename.c_str());
-		position = Tail::find_last_linefeed(infile);
-		if (position > last_position) {
-			
-			int length = Tail::find_line_lenght(infile, last_position);	
-			
-			for ( int tmp_pos = last_position; tmp_pos <= position - length; tmp_pos += length ){
-				
-				line_baton_t *line_bat = new line_baton_t();
-
-				line_bat->T = tail_bat->T;
-				line_bat->err = false;
-				
-				if ( tmp_pos < 0 ){
-					line_bat->err = true;
-					eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-					tail_bat->T->wstop = true;
-					break;
-				}
-				
-				infile.seekg(tmp_pos, ios::beg);
-				getline(infile, line_bat->line);
-				int tmp_tellg = infile.tellg();
-				
-				if ( tmp_tellg == -1 ) {
-					line_bat->err = true;
-					eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-					tail_bat->T->wstop = true;
-					break;
-				}
-				
-				length = tmp_tellg - tmp_pos;
-				eio_custom(EIO_Line, EIO_PRI_DEFAULT, EIO_AfterLine, line_bat);
-				
-			}
-			
-			last_position = position;
-			
-			if ( length < 0 )
-				break;
-			
-			
-		} else if ( position + length < last_position ) {				
-			position = Tail::find_last_linefeed(infile);
-			last_position = 0;
-			length = 0;
-		}
-		
-		usleep(250000);
-	}
-	
-	return;
-}
-
-int Tail::EIO_AfterTail(eio_req *req){
-	tail_baton_t *tail_bat = static_cast<tail_baton_t *>(req->data);
-	
-	tail_bat->T->Emit(end_symbol, 0, NULL);
-	
-	ev_unref(EV_DEFAULT_UC);
-	tail_bat->T->Unref();
-	return 0;
-}
-
-int Tail::EIO_AfterLine(eio_req *req){
-	line_baton_t *line_bat = static_cast<line_baton_t *>(req->data);
-	
-	if ( line_bat->err ){
-		line_bat->T->Emit(error_symbol, 0, NULL);
-	} else {
-		Local<Value> argv[1];
-		argv[0] = String::New(line_bat->line.c_str());
-		line_bat->T->Emit(data_symbol, 1, argv);  
-	}
-	
-	return 0;
+    int position = 0;
+    char *buffer;
+    
+    ifstream fp(handle->filename, ios::binary);
+    int line_length;
+    
+    fp.seekg(0, ios::end);
+    position = fp.tellg();
+    
+    if ( position > tail_instance->last_position ) {
+        
+        fp.seekg(tail_instance->last_position);
+        length = position - tail_instance->last_position;
+        buffer = new char[length];
+        fp.read (buffer, length);
+        string buffer_str(buffer, length);
+        
+        line_length = buffer_str.find_first_of(tail_instance->separator);
+               
+        while ( line_length != (int)string::npos && line_length != -1 ){
+            
+            Local<Value> argv[1] = { String::New(buffer_str.substr(0, line_length).c_str()) };
+            tail_instance->Emit(data_symbol, 1, argv);
+            
+            tail_instance->last_position += line_length + (int)tail_instance->separator.length();
+            
+            if ( line_length < (int)buffer_str.find_last_of(tail_instance->separator) && line_length != -1 )
+                buffer_str = buffer_str.substr(line_length + (int)tail_instance->separator.length());
+            else
+                break;
+            
+            line_length = buffer_str.find_first_of(tail_instance->separator);
+        }
+    }
+    
+	tail_instance->ontail = false;
 }
 
 
-
-v8::Persistent<FunctionTemplate> Tail::persistent_function_template;
-extern "C" {
-	static void init(Handle<Object> target) {
-		Tail::Init(target);
-	}
-	NODE_MODULE(tailnative, init);
-}
+NODE_MODULE(tailnative, Tail::Init);

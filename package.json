@@ -37,5 +37,5 @@
        } 
    ],
    "os": ["linux", "macos", "win"],
-   "cpu": ["x86", "ppc", "x86_64", "ia32", "darwin"]
+   "cpu": ["x86", "ppc", "x86_64", "ia32", "x64", "darwin"]
 }

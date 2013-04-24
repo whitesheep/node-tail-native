@@ -36,6 +36,6 @@
            "url": "https://github.com/whitesheep/node-tail-native.git" 
        } 
    ],
-   "os": ["linux", "macos", "win","darwin"],
+   "os": ["linux", "macos", "win","darwin","win32"],
    "cpu": ["x86", "ppc", "x86_64", "ia32", "x64"]
 }

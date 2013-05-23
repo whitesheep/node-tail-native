@@ -1,0 +1,157 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/opt/local/bin/node', '/opt/local/bin/npm', 'publish' ]
+2 info using npm@1.2.21
+3 info using node@v0.10.6
+4 verbose publish [ '.' ]
+5 verbose read json /Users/marco/Documents/project/node-tail-native/package.json
+6 warn package.json tailnative@0.3.1 No repository field.
+7 warn package.json tailnative@0.3.1 'repositories' (plural) Not supported.
+7 warn package.json Please pick one as the 'repository' field
+8 verbose cache add [ '.', null ]
+9 verbose cache add name=undefined spec="." args=[".",null]
+10 verbose parsed url { protocol: null,
+10 verbose parsed url   slashes: null,
+10 verbose parsed url   auth: null,
+10 verbose parsed url   host: null,
+10 verbose parsed url   port: null,
+10 verbose parsed url   hostname: null,
+10 verbose parsed url   hash: null,
+10 verbose parsed url   search: null,
+10 verbose parsed url   query: null,
+10 verbose parsed url   pathname: '.',
+10 verbose parsed url   path: '.',
+10 verbose parsed url   href: '.' }
+11 silly lockFile 3a52ce78- .
+12 verbose lock . /Users/marco/.npm/3a52ce78-.lock
+13 verbose read json package.json
+14 verbose tar pack [ '/var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz',
+14 verbose tar pack   '.' ]
+15 verbose tarball /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+16 verbose folder .
+17 info prepublish tailnative@0.3.1
+18 silly lockFile 3a52ce78- .
+19 verbose lock . /Users/marco/.npm/3a52ce78-.lock
+20 silly lockFile b5335334-9178-0-35873946850188076-tmp-tgz /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+21 verbose lock /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz /Users/marco/.npm/b5335334-9178-0-35873946850188076-tmp-tgz.lock
+22 silly lockFile 3a52ce78- .
+23 silly lockFile 3a52ce78- .
+24 silly lockFile b5335334-9178-0-35873946850188076-tmp-tgz /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+25 silly lockFile b5335334-9178-0-35873946850188076-tmp-tgz /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+26 verbose tar unpack /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+27 silly lockFile 83f5afd0-9178-0-35873946850188076-package /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+28 verbose lock /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package /Users/marco/.npm/83f5afd0-9178-0-35873946850188076-package.lock
+29 silly lockFile b5335334-9178-0-35873946850188076-tmp-tgz /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+30 verbose lock /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz /Users/marco/.npm/b5335334-9178-0-35873946850188076-tmp-tgz.lock
+31 silly gunzTarPerm modes [ '755', '644' ]
+32 silly gunzTarPerm extractEntry package.json
+33 silly gunzTarPerm extractEntry README.md
+34 silly gunzTarPerm extractEntry LICENSE
+35 silly gunzTarPerm extractEntry tailnative.js
+36 silly gunzTarPerm extractEntry binding.gyp
+37 silly gunzTarPerm extractEntry example/example1.js
+38 silly gunzTarPerm extractEntry example/example2.js
+39 silly gunzTarPerm extractEntry example/http-realtime-example.js
+40 silly gunzTarPerm extractEntry src/tail.cpp
+41 silly gunzTarPerm extractEntry src/tail.h
+42 verbose read json /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package/package.json
+43 silly lockFile 83f5afd0-9178-0-35873946850188076-package /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+44 silly lockFile 83f5afd0-9178-0-35873946850188076-package /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+45 silly lockFile b5335334-9178-0-35873946850188076-tmp-tgz /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+46 silly lockFile b5335334-9178-0-35873946850188076-tmp-tgz /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/tmp.tgz
+47 verbose from cache /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package/package.json
+48 verbose tar pack [ '/Users/marco/.npm/tailnative/0.3.1/package.tgz',
+48 verbose tar pack   '/var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package' ]
+49 verbose tarball /Users/marco/.npm/tailnative/0.3.1/package.tgz
+50 verbose folder /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+51 silly lockFile 83f5afd0-9178-0-35873946850188076-package /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+52 verbose lock /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package /Users/marco/.npm/83f5afd0-9178-0-35873946850188076-package.lock
+53 silly lockFile a03eba2f-npm-tailnative-0-3-1-package-tgz /Users/marco/.npm/tailnative/0.3.1/package.tgz
+54 verbose lock /Users/marco/.npm/tailnative/0.3.1/package.tgz /Users/marco/.npm/a03eba2f-npm-tailnative-0-3-1-package-tgz.lock
+55 silly lockFile 83f5afd0-9178-0-35873946850188076-package /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+56 silly lockFile 83f5afd0-9178-0-35873946850188076-package /var/folders/wx/3zm292711cjd2z40lg75g46c0000gn/T/npm-12365/1369325669178-0.35873946850188076/package
+57 silly lockFile a03eba2f-npm-tailnative-0-3-1-package-tgz /Users/marco/.npm/tailnative/0.3.1/package.tgz
+58 silly lockFile a03eba2f-npm-tailnative-0-3-1-package-tgz /Users/marco/.npm/tailnative/0.3.1/package.tgz
+59 silly lockFile a0d9a2fb-rco-npm-tailnative-0-3-1-package /Users/marco/.npm/tailnative/0.3.1/package
+60 verbose lock /Users/marco/.npm/tailnative/0.3.1/package /Users/marco/.npm/a0d9a2fb-rco-npm-tailnative-0-3-1-package.lock
+61 silly lockFile a0d9a2fb-rco-npm-tailnative-0-3-1-package /Users/marco/.npm/tailnative/0.3.1/package
+62 silly lockFile a0d9a2fb-rco-npm-tailnative-0-3-1-package /Users/marco/.npm/tailnative/0.3.1/package
+63 verbose tar unpack /Users/marco/.npm/tailnative/0.3.1/package.tgz
+64 silly lockFile a0d9a2fb-rco-npm-tailnative-0-3-1-package /Users/marco/.npm/tailnative/0.3.1/package
+65 verbose lock /Users/marco/.npm/tailnative/0.3.1/package /Users/marco/.npm/a0d9a2fb-rco-npm-tailnative-0-3-1-package.lock
+66 silly lockFile a03eba2f-npm-tailnative-0-3-1-package-tgz /Users/marco/.npm/tailnative/0.3.1/package.tgz
+67 verbose lock /Users/marco/.npm/tailnative/0.3.1/package.tgz /Users/marco/.npm/a03eba2f-npm-tailnative-0-3-1-package-tgz.lock
+68 silly gunzTarPerm modes [ '755', '644' ]
+69 silly gunzTarPerm extractEntry package.json
+70 silly gunzTarPerm extractEntry README.md
+71 silly gunzTarPerm extractEntry LICENSE
+72 silly gunzTarPerm extractEntry tailnative.js
+73 silly gunzTarPerm extractEntry binding.gyp
+74 silly gunzTarPerm extractEntry example/example1.js
+75 silly gunzTarPerm extractEntry example/example2.js
+76 silly gunzTarPerm extractEntry example/http-realtime-example.js
+77 silly gunzTarPerm extractEntry src/tail.cpp
+78 silly gunzTarPerm extractEntry src/tail.h
+79 verbose read json /Users/marco/.npm/tailnative/0.3.1/package/package.json
+80 silly lockFile a0d9a2fb-rco-npm-tailnative-0-3-1-package /Users/marco/.npm/tailnative/0.3.1/package
+81 silly lockFile a0d9a2fb-rco-npm-tailnative-0-3-1-package /Users/marco/.npm/tailnative/0.3.1/package
+82 silly lockFile a03eba2f-npm-tailnative-0-3-1-package-tgz /Users/marco/.npm/tailnative/0.3.1/package.tgz
+83 silly lockFile a03eba2f-npm-tailnative-0-3-1-package-tgz /Users/marco/.npm/tailnative/0.3.1/package.tgz
+84 verbose from cache /Users/marco/.npm/tailnative/0.3.1/package/package.json
+85 verbose chmod /Users/marco/.npm/tailnative/0.3.1/package.tgz 644
+86 verbose chown /Users/marco/.npm/tailnative/0.3.1/package.tgz [ 501, 20 ]
+87 silly lockFile 3a52ce78- .
+88 silly publish { name: 'tailnative',
+88 silly publish   version: '0.3.1',
+88 silly publish   main: 'tailnative',
+88 silly publish   description: 'Native (C++) Re-Implemetation of \'tail -f\' command',
+88 silly publish   scripts: { install: 'CXX=g++ node-gyp configure build' },
+88 silly publish   keywords: [ 'package', 'tail', 'tail -f', 'realtime line' ],
+88 silly publish   maintainers:
+88 silly publish    [ { name: 'Marco Rondini',
+88 silly publish        email: 'white_sheep@ihteam.net',
+88 silly publish        url: 'http://www.marcorondini.eu' } ],
+88 silly publish   contributors: [],
+88 silly publish   bugs: { url: 'https://github.com/whitesheep/node-tail-native/issues' },
+88 silly publish   licenses:
+88 silly publish    [ { type: 'GPLv2',
+88 silly publish        url: 'http://www.gnu.org/licenses/gpl-2.0.html' } ],
+88 silly publish   repositories:
+88 silly publish    [ { type: 'git',
+88 silly publish        url: 'https://github.com/whitesheep/node-tail-native.git' } ],
+88 silly publish   os: [ 'linux', 'macos', 'win', 'darwin', 'win32' ],
+88 silly publish   cpu: [ 'x86', 'ppc', 'x86_64', 'ia32', 'x64' ],
+88 silly publish   readme: 'Native module for node.js .\n\nRead new line in real time, as \'tail - f\'.\n\nInstall:\n========\n\n\tnpm install tailnative\n\nor\n\n\tgit clone git://github.com/whitesheep/node-tail-native.git\n\tcd node-tail-native\n\tnode-gyp configure build\n\n\nUse: \n========\n\nTailnative, from 0.3 version, support `line separator`\n\t\n\tnew Tail(filename, "\\r\\n");\n\n\n\n_Event emits:_\n\ndata \t`function(data){}`\nend\t\t`function(){}`\nerror\t`function(error){}`\n\n\n\n_Example code :_\n\n\tvar Tail = require("tailnative");\n\t\n\tvar lineseparator = "\\n";\n\tvar tail = new Tail(__dirname + "/testfile", lineseparator);\n\t\n    \n\ttail.on(\'data\', function(data){\n\t    console.log(this.file + \': \' + data);\n\t});\n\n\ttail.on(\'error\', function(){\n\t    console.log(\'error\');\n\t\ttail.close();\n\t});\n\n\ttail.on(\'end\', function(){\n\t    console.log(\'end\');\n\t});\n',
+88 silly publish   readmeFilename: 'README.md',
+88 silly publish   repository:
+88 silly publish    { type: 'git',
+88 silly publish      url: 'https://github.com/whitesheep/node-tail-native.git' },
+88 silly publish   _id: 'tailnative@0.3.1',
+88 silly publish   dist: { shasum: '905fdc9b2183051e17a7030af162a9deb6158209' },
+88 silly publish   _from: '.' }
+89 verbose url raw tailnative
+90 verbose url resolving [ 'https://registry.npmjs.org/', './tailnative' ]
+91 verbose url resolved https://registry.npmjs.org/tailnative
+92 info trying registry request attempt 1 at 18:15:31
+93 http PUT https://registry.npmjs.org/tailnative
+94 http 409 https://registry.npmjs.org/tailnative
+95 verbose url raw tailnative
+96 verbose url resolving [ 'https://registry.npmjs.org/', './tailnative' ]
+97 verbose url resolved https://registry.npmjs.org/tailnative
+98 info trying registry request attempt 1 at 18:15:32
+99 http GET https://registry.npmjs.org/tailnative
+100 http 200 https://registry.npmjs.org/tailnative
+101 error publish fail Cannot publish over existing version.
+101 error publish fail Update the 'version' field in package.json and try again.
+101 error publish fail
+101 error publish fail If the previous version was published in error, see:
+101 error publish fail     npm help unpublish
+101 error publish fail
+101 error publish fail To automatically increment version numbers, see:
+101 error publish fail     npm help version
+102 error System Darwin 11.4.2
+103 error command "/opt/local/bin/node" "/opt/local/bin/npm" "publish"
+104 error cwd /Users/marco/Documents/project/node-tail-native
+105 error node -v v0.10.6
+106 error npm -v 1.2.21
+107 error code EPUBLISHCONFLICT
+108 verbose exit [ 1, true ]

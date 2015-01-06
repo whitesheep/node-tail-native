@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <stdint.h>
 
 #include <v8.h> // v8 is the Javascript engine used by Node
 #include <node.h>
@@ -30,14 +31,15 @@ private:
     uv_fs_event_t _event_handle;
     
     static void OnEvent(uv_fs_event_t* handle, const char* filename, int events, int status);
-        
+
+    typedef int64_t file_position_type;
 public:
         
     bool ontail;
     
     string separator;
     
-    int last_position;
+    file_position_type last_position;
     
 	void Emit(Handle<String> event, int argc, Handle<Value> argv[]);
 		
@@ -51,3 +53,4 @@ public:
 	
 	static Handle<Value> close(const Arguments& args);
 };
+

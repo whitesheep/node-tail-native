@@ -132,12 +132,12 @@ void Tail::OnEvent(uv_fs_event_t* handle, const char* filename, int events, int 
     
     tail_instance->ontail = true;
     
-	int length = 0;
-    int position = 0;
+    file_position_type length = 0;
+    file_position_type position = 0;
     char *buffer;
     
     ifstream fp(handle->filename, ios::binary);
-    int line_length;
+    file_position_type line_length;
     
     fp.seekg(0, ios::end);
     position = fp.tellg();
